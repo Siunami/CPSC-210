@@ -1,0 +1,134 @@
+package ca.ubc.cs.cpsc210.mindthegap.parsers;
+
+import ca.ubc.cs.cpsc210.mindthegap.model.*;
+import ca.ubc.cs.cpsc210.mindthegap.parsers.exception.TfLLineDataMissingException;
+import ca.ubc.cs.cpsc210.mindthegap.util.LatLon;
+
+import javax.json.*;
+import javax.xml.bind.util.JAXBSource;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * A parser for the data returned by TFL line route query
+ */
+public class TfLLineParser extends TfLAbstractParser {
+
+    /**
+     * Parse line from JSON response produced by TfL.
+     *
+     * @param lmd              line meta-data
+     * @return                 line parsed from TfL data
+     * @throws JsonException   when JSON data does not have expected format
+     * @throws TfLLineDataMissingException when
+     * <ul>
+     *  <li> JSON data is missing lineName, lineId or stopPointSequences elements </li>
+     *  <li> or, for a given sequence: </li>
+     *    <ul>
+     *      <li> the stopPoint array is missing, or </li>
+     *      <li> all station elements are missing one of name, lat, lon or stationId elements </li>
+     *    </ul>
+     * </ul>
+     */
+    public static Line parseLine(LineResourceData lmd, String jsonResponse)
+            throws JsonException, TfLLineDataMissingException {
+
+        JsonReader reader = Json.createReader(new StringReader(jsonResponse));
+        JsonObject rootJSON = reader.readObject();
+        reader.close();
+
+        if (!rootJSON.containsKey("lineId") || !rootJSON.containsKey("lineName") || !rootJSON.containsKey("stopPointSequences")) {
+            throw new TfLLineDataMissingException();
+        }
+
+        String lineId, lineName;
+        try {
+            lineId = rootJSON.getString("lineId");
+            lineName = rootJSON.getString("lineName");
+        } catch (Exception e) {
+            throw new JsonException(e.getMessage());
+        }
+
+        Line line = new Line(lmd, lineId, lineName);
+
+        line = parseLineString(rootJSON, line);
+
+        line = parseStopPointSequences(rootJSON, line);
+
+        return line;
+    }
+
+    private static Line parseStopPointSequences(JsonObject rootJSON, Line line) throws TfLLineDataMissingException {
+
+        JsonArray stopPointSequences;
+        try {
+            stopPointSequences = rootJSON.getJsonArray("stopPointSequences");
+        } catch (Exception e) {
+            throw new JsonException(e.getMessage());
+        }
+
+        for (int index = 0; index < stopPointSequences.size(); index++) {
+            JsonObject stopPointSequence;
+            try {
+                stopPointSequence = stopPointSequences.getJsonObject(index);
+            } catch (Exception e) {
+                throw new JsonException(e.getMessage());
+            }
+
+            if (!stopPointSequence.containsKey("stopPoint")) {
+                throw new TfLLineDataMissingException();
+            }
+
+            JsonArray stopPoints;
+            try {
+                stopPoints = stopPointSequence.getJsonArray("stopPoint");
+            } catch (Exception e) {
+                throw new JsonException(e.getMessage());
+            }
+
+            for (index = 0; index < stopPointSequences.size(); index++) {
+                JsonObject stopPoint;
+                try {
+                    stopPoint = stopPoints.getJsonObject(index);
+                } catch (Exception e) {
+                    throw new JsonException(e.getMessage());
+                }
+
+                if (!stopPoint.containsKey("stationId") || !stopPoint.containsKey("name") ||
+                        !stopPoint.containsKey("lat") || !stopPoint.containsKey("lon")) {
+                    throw new TfLLineDataMissingException();
+                }
+
+                try {
+                    String stationId = stopPoint.getString("stationId");
+                    String name = TfLAbstractParser.parseName(stopPoint.getString("name"));
+                    Double lat = stopPoint.getJsonNumber("lat").doubleValue();
+                    Double lon = stopPoint.getJsonNumber("lon").doubleValue();
+                    LatLon locn = new LatLon(lat, lon);
+                    Station station = new Station(stationId, name, locn);
+
+                    if (!line.getStations().contains(station)) {
+                        line.addStation(station);
+                    }
+                } catch (Exception e) {
+                    throw new JsonException(e.getMessage());
+                }
+            }
+        }
+        return line;
+    }
+
+    private static Line parseLineString(JsonObject rootJSON, Line line) {
+        try {
+            JsonArray lineStrings = rootJSON.getJsonArray("lineStrings");
+            for (int index = 0; index < lineStrings.size(); index++) {
+                Branch branch = new Branch(lineStrings.getString(index));
+                line.addBranch(branch);
+            }
+            return line;
+        } catch (Exception e) {
+            throw new JsonException(e.getMessage());
+        }
+    }
+}
