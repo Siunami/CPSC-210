@@ -1,0 +1,45 @@
+Task M1
+The constructor for Class Album was not assigning its parameter to the variable.
+changed 'name = name' to 'this.name = name'
+
+Task M2
+TagManagerTest.testRenameToSame
+-bug was in the class: TagManager, method: renameTag()
+-when the parameter oldName and newName are the same, it should have returned false, 
+ but was originally set to true.
+
+PhotoLibraryTest.testRenameTagWithPhotos
+-bug was in the class: PhotoLibraryTest, test: testRenameTagWithPhotos()
+-the test should have asserted the name of theTag as "newBirthday", instead it was asserted as "birthday"
+
+Task M3
+- bug was in the class: PhotoManager, method: findPhotosInDateRange()
+- in the method, the criteria for selecting photo should have been:
+  its date is not before the given start date AND not after the given end date.
+  it was set as date is not before given start date OR not after the given end date. 
+
+
+Task M4
+code before:
+        for (int x = 0; x < width / 2; x++) {
+            for (int y = 0; y < height; y++) {
+                image.setRGB(width - 1 - x, y, image.getRGB(x, y));
+                image.setRGB(x, y, image.getRGB(width - 1 - x, y)); 
+code after: 
+        for (int x = 0; x < width / 2; x++) {
+            for (int y = 0; y < height; y++) {
+                int leftRGB = image.getRGB(x, y);
+                int rightRGB = image.getRGB(width - 1 - x, y);
+                image.setRGB(width - 1 - x, y, leftRGB);
+                image.setRGB(x, y, rightRGB);
+
+Task M5
+code before:
+    private boolean isInBounds(int x, int y) {
+        return x > 0 && x < image.getWidth() && y > 0 && y < image.getHeight();
+    }
+
+code after: 
+    private boolean isInBounds(int x, int y) {
+        return x >= 0 && x < image.getWidth() && y >= 0 && y < image.getHeight();
+    }
