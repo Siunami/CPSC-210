@@ -1,0 +1,14 @@
+Hypothese from Task M5
+1. From testing method: rotateRight()
+   bug is that the snake does not properly rotate right when the direction is DIRECTION.UP
+
+2. From testing method: eat()
+   bug is that when snake eats a new food, snake's nutritionalConsumed value is replaced, when it should add.
+
+
+Design Principle from Task M6
+The test: testIsGameOverMoveUp fails.
+The test assumes that moving snake 5 times up will end the game.
+This is only true when the snake is 5 tiles away from the wall in vertical distance.
+if the vertical distance become larger, or snake's starting position change, the test fails.
+It should instead have a value relative to its current position and vertical boundaries.
