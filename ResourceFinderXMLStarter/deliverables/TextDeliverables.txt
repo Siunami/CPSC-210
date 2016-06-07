@@ -1,0 +1,14 @@
+ Task M5 : newly added resource
+    <resource>
+        <name>Legal Service Society</name>
+        <address>400-510 Burrard Street, Vancouver, BC V6C 3A8</address>
+        <location>
+            <lat>49.285966</lat>
+            <lon>-123.117577</lon>
+        </location>
+        <webaddress>http://www.legalaid.bc.ca/</webaddress>
+        <phone>604-601-6000</phone>
+        <services>
+            <service>Legal advice</service>
+        </services>
+    </resource>
