@@ -1,0 +1,15 @@
+Task P3
+To add a new service "Discount" which will not charge anything,
+you first add enumeration "Discount" in ServiceType class.
+
+Then you will have to add fields
+DISC_CALLOUT
+DISC_SERVICE_HOURLY
+DISC_SERVICEPTS_BASE
+DISC_SERVICEPTS_HOURLY
+and assign them values you want.
+
+Then you will have add implementation for enumeration "Discount" to
+getServicePoints
+getCalloutFee
+getServiceFee

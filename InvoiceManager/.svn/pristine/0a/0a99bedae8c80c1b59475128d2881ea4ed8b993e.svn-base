@@ -1,0 +1,73 @@
+package ca.ubc.cs.cpsc210.invoicemanager.model;
+
+// Represents a service provided for a customer
+public class ServiceRecord extends AbstractServiceRecord {
+
+    // EFFECTS: constructs service record for service of given number of hours and given type
+    public ServiceRecord(ServiceType serviceType, int hours) {
+        super(hours, serviceType);
+        this.recordID = ++nextRecordID;
+        buildInvoice();
+    }
+
+    // EFFECTS: returns number of service points earned with this service record
+    @Override
+    public int getServicePoints() {
+        int servicePoints = 0;
+
+        switch(serviceType) {
+            case REGULAR:
+                servicePoints = RegularServiceRecord.REG_SERVICEPTS_BASE + hours * RegularServiceRecord.REG_SERVICEPTS_HOURLY;
+                break;
+            case AFTER_HOURS:
+                servicePoints = AfterHoursServiceRecord.AFTER_HOURS_SERVICEPTS_BASE + hours * AfterHoursServiceRecord.AFTER_HOURS_SERVICEPTS_HOURLY;
+                break;
+            case EMERGENCY:
+                servicePoints = EmergencyServiceRecord.EMERG_SERVICEPTS_BASE + hours * EmergencyServiceRecord.EMERG_SERVICEPTS_HOURLY;
+                break;
+        }
+
+        return servicePoints;
+    }
+
+    // EFFECTS: returns callout fee in $ for this service record
+    @Override
+    public int getCalloutFee() {
+        int calloutFee = 0;
+
+        switch(serviceType) {
+            case REGULAR:
+                calloutFee = RegularServiceRecord.REG_CALLOUT;
+                break;
+            case AFTER_HOURS:
+                calloutFee = AfterHoursServiceRecord.AFTER_HOURS_CALLOUT;
+                break;
+            case EMERGENCY:
+                calloutFee = EmergencyServiceRecord.EMERG_CALLOUT;
+                break;
+        }
+
+        return calloutFee;
+    }
+
+    // EFFECTS: returns service fee in $ for this service record
+    @Override
+    public int getServiceFee() {
+        int serviceFee = 0;
+
+        switch(serviceType) {
+            case REGULAR:
+                serviceFee = RegularServiceRecord.REG_SERVICE_HOURLY * hours;
+                break;
+            case AFTER_HOURS:
+                serviceFee = AfterHoursServiceRecord.AFTER_HOURS_SERVICE_HOURLY * hours;
+                break;
+            case EMERGENCY:
+                serviceFee = EmergencyServiceRecord.EMERG_SERVICE_HOURLY * hours;
+                break;
+        }
+
+        return serviceFee;
+    }
+
+}

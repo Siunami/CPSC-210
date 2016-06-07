@@ -1,0 +1,59 @@
+package ca.ubc.cs.cpsc210.invoicemanager.tests;
+
+import ca.ubc.cs.cpsc210.invoicemanager.model.*;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
+
+// Unit tests for AbstractServiceRecord
+public class ServiceRecordTest {
+    private AbstractServiceRecord testAbstractServiceRecord;
+
+    @Test
+    public void testRegular() {
+        testAbstractServiceRecord = AbstractServiceRecord.createServiceRecord(ServiceType.REGULAR, 2);
+
+        assertEquals(RegularServiceRecord.REG_SERVICEPTS_BASE + 2 * RegularServiceRecord.REG_SERVICEPTS_HOURLY,
+                testAbstractServiceRecord.getServicePoints());
+
+        int calloutFee = RegularServiceRecord.REG_CALLOUT;
+        int serviceFee = RegularServiceRecord.REG_SERVICE_HOURLY * 2;
+        assertEquals(calloutFee, testAbstractServiceRecord.getCalloutFee());
+        assertEquals(serviceFee, testAbstractServiceRecord.getServiceFee());
+
+        Invoice invoice = testAbstractServiceRecord.getInvoice();
+        assertEquals(calloutFee + serviceFee, invoice.getAmountOwing());
+    }
+
+    @Test
+    public void testAfterHours() {
+        testAbstractServiceRecord = AbstractServiceRecord.createServiceRecord(ServiceType.AFTER_HOURS, 2);
+
+        assertEquals(AfterHoursServiceRecord.AFTER_HOURS_SERVICEPTS_BASE + 2 * AfterHoursServiceRecord.AFTER_HOURS_SERVICEPTS_HOURLY,
+                testAbstractServiceRecord.getServicePoints());
+
+        int calloutFee = AfterHoursServiceRecord.AFTER_HOURS_CALLOUT;
+        int serviceFee = AfterHoursServiceRecord.AFTER_HOURS_SERVICE_HOURLY * 2;
+        assertEquals(calloutFee, testAbstractServiceRecord.getCalloutFee());
+        assertEquals(serviceFee, testAbstractServiceRecord.getServiceFee());
+
+        Invoice invoice = testAbstractServiceRecord.getInvoice();
+        assertEquals(calloutFee + serviceFee, invoice.getAmountOwing());
+    }
+
+    @Test
+    public void testEmergency() {
+        testAbstractServiceRecord = AbstractServiceRecord.createServiceRecord(ServiceType.EMERGENCY, 2);
+
+        assertEquals(EmergencyServiceRecord.EMERG_SERVICEPTS_BASE + 2 * EmergencyServiceRecord.EMERG_SERVICEPTS_HOURLY,
+                testAbstractServiceRecord.getServicePoints());
+
+        int calloutFee = EmergencyServiceRecord.EMERG_CALLOUT;
+        int serviceFee = EmergencyServiceRecord.EMERG_SERVICE_HOURLY * 2;
+        assertEquals(calloutFee, testAbstractServiceRecord.getCalloutFee());
+        assertEquals(serviceFee, testAbstractServiceRecord.getServiceFee());
+
+        Invoice invoice = testAbstractServiceRecord.getInvoice();
+        assertEquals(calloutFee + serviceFee, invoice.getAmountOwing());
+    }
+}
